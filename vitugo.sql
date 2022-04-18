@@ -43,6 +43,7 @@ CREATE TABLE comments (
     FOREIGN KEY (cmt_article) REFERENCES articles (art_id),
     FOREIGN KEY (cmt_author) REFERENCES users (user_id)
 );
+
 -- Cria tabela com contatos do site
 CREATE TABLE contacts (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -51,37 +52,35 @@ CREATE TABLE contacts (
     subject VARCHAR(255),
     message TEXT,
     date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('on', 'off', 'deleted') DEFAULT 'on',
+    status ENUM('on', 'off', 'deleted') DEFAULT 'on'
 );
+
+
 -- Insere dados em 'users'
 INSERT INTO users (
     user_name,
     user_email,
     user_birth,
     user_photo,
-    user_profile
+    user_profile,
+    user_type
 ) VALUES 
 (
     'Setembrino Trocatapas',
     'set@brino.com',
     '1990-10-14',
     'https://randomuser.me/api/portraits/lego/6.jpg',
-    'Programador, agricultor, enrolador, fazedor de nada.'
+    'Programador, agricultor, enrolador, fazedor de nada.',
+    'author'
 ),
 (
     'Emegarda Sirineuza',
     'emen@siri.com',
     '2000-01-11',
     'https://randomuser.me/api/portraits/lego/3.jpg',
-    ''
+    'Cantora, compositora, arranjadora, arrumadora e operadora.',
+    'user'
 ),
-(
-    '',
-    '',
-    '',
-    '',
-    ''
-);),
 (
     'Eletricildo Chocante',
     'eletro@choque.com',
@@ -89,7 +88,9 @@ INSERT INTO users (
     'https://randomuser.me/api/portraits/lego/5.jpg',
     'Motorista, eletricista, ortopedista e horista.',
     'admin'
-);-- Insere dados em 'articles'
+);
+
+-- Insere dados em 'articles'
 INSERT INTO articles (
     art_title,
     art_intro,
