@@ -19,7 +19,7 @@
 
         <header>
 
-            <a href="/" title="Página inicial"><i class="fa-solid fa-bug fa-fw"></i></a>
+            <a href="/" title="Página inicial"><i class="fa-solid fa-cubes fa-fw"></i></a>
 
             <h1>Vitugo<small>Quem tem fome tem pressa.</small></h1>
 
