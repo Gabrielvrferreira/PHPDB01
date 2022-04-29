@@ -103,6 +103,7 @@ $res = $conn->query($sql);
 // Verifica se tem artigos
 if ($res->num_rows > 0) :
 
+
     $html_author .= <<<HTML
 
 <div class="author_articles">
@@ -114,17 +115,20 @@ HTML;
     // Loop para pegar todos os artigos recebidos
     while ($mais_artigos = $res->fetch_assoc()) :
 
-    // Monta lista de artigos
-    $html_author .= <<<HTML
+        // Monta lista de artigos
+        $html_author .= <<<HTML
 
-<div class="item" onclick="location.href='/ler/?id={$mais_artigos['art_id']}'">
-    <h4>{$mais_artigos['art_title']}</h4>
-    <small>{$mais_artigos['art_intro']}</small>
-</div>
+    <div class="item" onclick="location.href='/ler/?id={$mais_artigos['art_id']}'">
+        <h4>{$mais_artigos['art_title']}</h4>
+        <small>{$mais_artigos['art_intro']}</small>
+    </div>
 
 HTML;
 
     endwhile;
+
+    // Fecha lsita de artigos
+    $html_author .= "</div>";
 
 endif;
 
