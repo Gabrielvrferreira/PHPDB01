@@ -17,8 +17,14 @@ require($_SERVER['DOCUMENT_ROOT'] . '/_config.php');
  * Seus códigos PHP desta página iniciam aqui! *
  ***********************************************/
 
+// Se usuário já está logado, redireciona para a página de perfil dele.
+if(isset($_COOKIE['user'])) header('Location: /user/profile/');
+
 // Variáveis principais
 $email = $password = $feedback = '';
+
+// O cookie durará somente a sessão. Navegador aberto.
+$logged = 0;
 
 // Processa o formulário, somente se ele foi enviado...
 if ($_SERVER["REQUEST_METHOD"] == "POST") :
@@ -27,14 +33,66 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
     $email = trim(filter_var($_POST['email'], FILTER_SANITIZE_EMAIL));
     $password = trim(htmlspecialchars($_POST['password']));
 
+    // Se o usuário quer manter-se logado...
+    if (isset($_POST['logged'])) :
+
+        // O cookie durará 365 dias em segundos;
+        $logged = time() + (86400 * 365);
+
+    endif;
+
     // Verifica sem tem algum campo vazio
-    if ($email === '' or $password == '') :
+    if ($email === '' or $password === '') :
 
         // Mensagem de erro para usuário
         $feedback = "Os campos não podem estar vazios.";
 
-    endif;
+    // Se todos os campos foram preenchidos.
+    else :
 
+        // SQL para verificar no banco de dados
+        $sql = <<<SQL
+
+SELECT * FROM `users`
+WHERE user_email = '{$email}'
+	AND user_password = SHA1('{$password}')
+    AND user_status = 'on';
+
+SQL;
+
+        // Executa a query
+        $res = $conn->query($sql);
+
+        // Se não achou o usuário...
+        if ($res->num_rows != 1) :
+
+            // Mensagem de erro para usuário
+            $feedback = "Usuário e/ou senha não encontrados.";
+
+        // Se achou o usuário...
+        else :
+
+            // Obtém dados do usuário
+            $user = $res->fetch_assoc();
+
+            // Apaga a senha
+            unset($user['user_password']);
+
+            // Grava o cookie no navegador
+            // OBS:  cookies devem ser criados antes de enviar qualquer coisa para o navegador.
+            setcookie(
+                'user',                 // nome do cookie criado
+                serialize($user),       // valor do cookie
+                $logged,                // tempo de vida do cookie em segundos
+                '/'                     // Domínio do cookie "/" de localhost
+            );
+
+            // envia usuário para a página inicial
+            header('Location: /');
+
+        endif;
+
+    endif;
 
 endif;
 
@@ -65,7 +123,19 @@ require($_SERVER['DOCUMENT_ROOT'] . '/_header.php');
 
     <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post">
 
-        <p>Logue-se para ter acesso ao conteúdo exclusivo.</p>
+        <?php
+
+        // Exibe mensagens de erro
+        if ($feedback != '') :
+
+            echo '<p class="feedback">';
+            echo $feedback;
+            echo '</p>';
+
+        endif;
+        ?>
+
+        <p>Logue-se para ter acesso ao conteúdo exclusivo. Se ainda não se cadastrou, <a href="/user/new/">cadastre-se aqui</a>.</p>
 
         <p>
             <label for="email">E-mail:</label>
@@ -88,6 +158,13 @@ require($_SERVER['DOCUMENT_ROOT'] . '/_header.php');
 
         <p>
             <button type="submit">Entrar</button>
+        </p>
+
+        <hr>
+
+        <p class="user-links">
+            <a href="/user/newpass/"><i class="fa-solid fa-key fa-fw"></i> Lembrar senha</a>
+            <a href="/user/new/"><i class="fa-solid fa-user-plus fa-fw"></i> Cadastre-se</a>
         </p>
 
     </form>

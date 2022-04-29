@@ -4,15 +4,15 @@
 
 /* Folhas de estilo de contatos. */
 
-form[name="contatos"] label {
+form label {
     display: block;
     margin-bottom: .25rem;
     margin-left: .25rem;
 }
 
-form[name="contatos"] input,
-form[name="contatos"] textarea,
-form[name="contatos"] button,
+form input,
+form textarea,
+form button,
 button[onclick] {
     font-family: inherit;
     font-size: inherit;
@@ -21,17 +21,17 @@ button[onclick] {
     border-radius: .3rem;
 }
 
-form[name="contatos"] input,
-form[name="contatos"] textarea {
+form input,
+form textarea {
     width: 100%;
 }
 
-form[name="contatos"] textarea {
+form textarea {
     height: 6rem;
     resize: vertical;
 }
 
-form[name="contatos"] button,
+form button,
 button[onclick] {
     background: linear-gradient(rgb(31, 70, 102), rgb(103, 164, 214));
     color: #fff;
@@ -39,30 +39,30 @@ button[onclick] {
     cursor: pointer;
 }
 
-form[name="contatos"] button:hover,
+form button:hover,
 button[onclick]:hover {
     background: linear-gradient(rgb(170, 45, 0), rgb(246, 125, 81));
 }
 
 /* Marca campos inválidos. */
 
-form[name="contatos"] input:invalid,
-form[name="contatos"] textarea:invalid {
+form input:invalid,
+form textarea:invalid {
     background: rgb(255, 207, 207);
     border-bottom: 3px solid red;
 }
 
 /* Marca campos válidos. */
 
-form[name="contatos"] input:valid,
-form[name="contatos"] textarea:valid {
+form input:valid,
+form textarea:valid {
     background: rgb(232, 240, 254);
     border-bottom: 3px solid green;
 }
 
 /* Desabilita botão de envio se formulário está inválido. */
 
-form[name="contatos"]:invalid button {
+form:invalid button {
     background: linear-gradient(rgb(88, 88, 88), grey);
     color: rgb(219, 219, 219);
     cursor: not-allowed;

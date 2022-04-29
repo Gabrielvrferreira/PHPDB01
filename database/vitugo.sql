@@ -5,7 +5,7 @@ DROP DATABASE IF EXISTS vitugo;
 CREATE DATABASE vitugo CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 -- Seleciona banco de dados.
-USE vitugo;
+USE vitugo; 
 
 -- Cria tabela de usuários/autores.
 CREATE TABLE users (
@@ -16,6 +16,7 @@ CREATE TABLE users (
     user_photo VARCHAR(255),
     user_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     user_profile TEXT,
+    user_password VARCHAR(255),
     user_type ENUM('user', 'author', 'admin') DEFAULT 'user',
     user_status ENUM('on', 'off', 'deleted') DEFAULT 'on'
 );
@@ -62,6 +63,7 @@ INSERT INTO users (
     user_birth,
     user_photo,
     user_profile,
+    user_password,
     user_type
 ) VALUES 
 (
@@ -70,6 +72,7 @@ INSERT INTO users (
     '1990-10-14',
     'https://randomuser.me/api/portraits/lego/6.jpg',
     'Programador, agricultor, enrolador, fazedor de nada.',
+    SHA1('123'),
     'author'
 ),
 (
@@ -78,6 +81,7 @@ INSERT INTO users (
     '2000-01-11',
     'https://randomuser.me/api/portraits/lego/3.jpg',
     'Cantora, compositora, arranjadora, arrumadora e operadora.',
+    SHA1('123'),
     'user'
 ),
 (
@@ -86,6 +90,7 @@ INSERT INTO users (
     '1981-05-02',
     'https://randomuser.me/api/portraits/lego/5.jpg',
     'Motorista, eletricista, ortopedista e horista.',
+    SHA1('123'),
     'admin'
 ),
 (
@@ -94,6 +99,7 @@ INSERT INTO users (
     '1991-10-12',
     'https://randomuser.me/api/portraits/lego/1.jpg',
     'Motorista, eletricista, ortopedista e horista.',
+    SHA1('123'),
     'author'
 ),
 (
@@ -102,6 +108,7 @@ INSERT INTO users (
     '2000-11-01',
     'https://randomuser.me/api/portraits/lego/2.jpg',
     'Motorista, eletricista, ortopedista e horista.',
+    SHA1('123'),
     'author'
 );
 

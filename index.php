@@ -16,23 +16,24 @@ $artigos = '';
 $sql = <<<SQL
 
 SELECT art_id, art_title, art_intro, art_thumb 
-FROM `articles`
+    FROM articles
 WHERE art_status = 'on'
-AND art_date <= NOW()
+    AND art_date <= NOW()
 ORDER BY art_date DESC;
 
 SQL;
 
-// Executa a query. $res contém os artigos encontrados.
+// Executa a query --> '$res' contém os artigos encontrados.
 $res = $conn->query($sql);
 
-// Obtém cada registro de $res
+// Loop que obtém cada registro de '$res'
 while ($artigo = $res->fetch_assoc()) :
 
+    // Formata HTML de saída
     $artigos .= <<<HTML
 
-        <div class="item" onclick="location.href = '/ler/?id={$artigo['art_id']}'">
-            <div class="thumb" style="background-image: url('{$artigo['art_thumb']}')" title="{$artigo['art_title']}"></div>
+        <div class="item" onclick="location.href='/ler/?id={$artigo['art_id']}'">
+            <div class="thumb" style="background-image: url('{$artigo['art_thumb']}')" title="Imagem de {$artigo['art_title']}"></div>
             <div class="body">
                 <h4>{$artigo['art_title']}</h4>
                 <span>{$artigo['art_intro']}</span>
@@ -63,8 +64,10 @@ require($_SERVER['DOCUMENT_ROOT'] . '/_header.php');
 
     <div class="items">
         <?php
+
         // Exibe todos os artigos.
         echo $artigos;
+
         ?>
     </div>
 
