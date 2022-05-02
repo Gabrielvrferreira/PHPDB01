@@ -19,7 +19,7 @@
 
         <header>
 
-            <a href="/" title="Página inicial"><i class="fa-solid fa-cubes fa-fw"></i></a>
+            <a href="/" title="Página inicial"><i class="fa-solid fa-bug fa-fw"></i></a>
 
             <h1>Vitugo<small>Quem tem fome tem pressa.</small></h1>
 
@@ -29,11 +29,35 @@
 
             <a href="/" title="Página inicial"><i class="fa-solid fa-house-chimney fa-fw"></i><span>Início</span></a>
 
-            <a href="/contatos" title="Faça contato"><i class="fa-solid fa-comment-dots fa-fw"></i><span>Contatos</span></a>
+            <a href="/contatos/" title="Faça contato"><i class="fa-solid fa-comment-dots fa-fw"></i><span>Contatos</span></a>
 
-            <a href="/sobre" title="Sobre..."><i class="fa-solid fa-circle-info fa-fw"></i><span>Sobre</span></a>
+            <a href="/sobre/" title="Sobre..."><i class="fa-solid fa-circle-info fa-fw"></i><span>Sobre</span></a>
 
-            <a href="/usuario" title="Usuário"><i class="fa-solid fa-user fa-fw"></i><span>Usuário</span></a>
+            <?php
+
+            // Se usuário está logado...
+            if ($user) :
+            ?>
+
+                <a href="/user/profile/" title="Usuário">
+                    <img src="<?php echo $user['user_photo'] ?>" alt="<?php echo $user['user_name'] ?>">
+                    <span>Profile</span>
+                </a>
+
+            <?php
+
+            // Se usuário NÃO está logado
+            else :
+            ?>
+
+                <a href="/user/login/" title="Usuário">
+                    <i class="fa-solid fa-right-to-bracket fa-fw"></i>
+                    <span>Login</span>
+                </a>
+
+            <?php
+            endif;
+            ?>
 
         </nav>
 

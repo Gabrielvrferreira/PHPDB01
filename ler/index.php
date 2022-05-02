@@ -25,7 +25,8 @@ if ($id === 0) header('Location: /index.php');
 $sql = <<<SQL
 
 SELECT *,
-	    DATE_FORMAT(art_date, '%d/%m/%Y às %H:%i') AS date_br,
+	    -- DATE_FORMAT(art_date, '%d/%m/%Y às %H:%i') AS date_br,
+        DATE_FORMAT(art_date, '%d/%m/%Y') AS date_br,
         DATE_FORMAT(user_birth, '%d/%m/%Y') AS birth_br
     FROM `articles`
 INNER JOIN `users` ON art_author = user_id
@@ -68,7 +69,7 @@ $idade = get_years_old($artigo['user_birth']);
 // Formata HTML para o autor
 $html_author = <<<HTML
 
-<div class="author_meta">
+<div class="author-meta">
 
     <img src="{$artigo['user_photo']}" alt="{$artigo['user_name']}">
     <h3>{$nome}</h3>
@@ -106,7 +107,7 @@ if ($res->num_rows > 0) :
 
     $html_author .= <<<HTML
 
-<div class="author_articles">
+<div class="author-articles">
 
     <h3>+ Artigos de {$nome}</h3>
 
@@ -118,7 +119,7 @@ HTML;
         // Monta lista de artigos
         $html_author .= <<<HTML
 
-    <div class="item" onclick="location.href='/ler/?id={$mais_artigos['art_id']}'">
+    <div class="author-article" onclick="location.href='/ler/?id={$mais_artigos['art_id']}'">
         <h4>{$mais_artigos['art_title']}</h4>
         <small>{$mais_artigos['art_intro']}</small>
     </div>

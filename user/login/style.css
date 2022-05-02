@@ -1,0 +1,26 @@
+@import url('/style.css');
+
+@import url('/contatos/style.css');
+
+form {
+    display: table;
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+}
+
+input[type="checkbox"] {
+    width: auto;
+}
+
+.feedback {
+    background: rgb(255, 180, 180);
+    border-radius: .3rem;
+    padding: .5rem;
+    color: rgb(101, 0, 0);
+}
+
+.user-links {
+    display: flex;
+    justify-content: space-around;
+}

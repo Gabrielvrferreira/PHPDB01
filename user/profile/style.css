@@ -1,0 +1,27 @@
+@import url('/style.css');
+
+@import url('/ler/style.css');
+
+@import url('/contatos/style.css');
+
+.author-meta {
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+}
+
+.author-meta ul {
+    font-size: inherit;
+    margin: 0;
+    padding-left: 1rem;
+}
+
+.author-meta h2 {
+    text-align: center;
+}
+
+.btn-user {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}

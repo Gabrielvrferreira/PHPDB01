@@ -1,0 +1,48 @@
+/* Importa folhas de estilos principal */
+
+@import url('/style.css');
+
+/* Folhas de estilo de ler */
+
+.author-date {
+    margin-top: 1rem;
+    font-size: small;
+    text-align: right;
+    font-style: italic;
+}
+
+section img {
+    width: 100%;
+    max-width: auto;
+}
+
+.author-meta img {
+    display: block;
+    width: 100%;
+    max-width: 200px;
+    margin: auto;
+    border-radius: .5rem;
+}
+
+.author-meta ul {
+    font-size: small;
+    margin: 0;
+    padding-left: 1rem;
+}
+
+.author-article {
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.author-article:last-child {
+    margin-bottom: 0;
+}
+
+.author-article:hover h4 {
+    color: steelblue;
+}
+
+.author-article h4 {
+    margin: 0;
+}
