@@ -72,7 +72,7 @@ INSERT INTO users (
     '1990-10-14',
     'https://randomuser.me/api/portraits/lego/6.jpg',
     'Programador, agricultor, enrolador, fazedor de nada.',
-    SHA1('123'),
+    SHA1('Qw3rtyui0P'),
     'author'
 ),
 (
@@ -81,7 +81,7 @@ INSERT INTO users (
     '2000-01-11',
     'https://randomuser.me/api/portraits/lego/3.jpg',
     'Cantora, compositora, arranjadora, arrumadora e operadora.',
-    SHA1('123'),
+    SHA1('Qw3rtyui0P'),
     'user'
 ),
 (
@@ -90,7 +90,7 @@ INSERT INTO users (
     '1981-05-02',
     'https://randomuser.me/api/portraits/lego/5.jpg',
     'Motorista, eletricista, ortopedista e horista.',
-    SHA1('123'),
+    SHA1('Qw3rtyui0P'),
     'admin'
 ),
 (
@@ -99,7 +99,7 @@ INSERT INTO users (
     '1991-10-12',
     'https://randomuser.me/api/portraits/lego/1.jpg',
     'Motorista, eletricista, ortopedista e horista.',
-    SHA1('123'),
+    SHA1('Qw3rtyui0P'),
     'author'
 ),
 (
@@ -108,7 +108,7 @@ INSERT INTO users (
     '2000-11-01',
     'https://randomuser.me/api/portraits/lego/2.jpg',
     'Motorista, eletricista, ortopedista e horista.',
-    SHA1('123'),
+    SHA1('Qw3rtyui0P'),
     'author'
 );
 
