@@ -141,3 +141,93 @@ function dump($variable, $exit = true, $pre = true)
     if ($pre) echo '</pre>';
     if ($exit) exit;
 }
+
+/**
+ * Função que envia uma imagem para o servidor via PHP upload.
+ * 
+ * O primeiro parâmetro é obrigatório e especifica o caminho absoluto do 
+ * aplicativo, onde a imagem será armazenada, com base na raiz do aplicativo.
+ * Esse atributo deve sempre terminar com a '/'.
+ * 
+ * O segundo parâmetro define o nome da imagem, sem a extensão.
+ * Se este for omitido, a função gera um nome aleatório de 24 caracteres 
+ * hexadecimais (12 bytes).
+ * 
+ * Exemplos de uso:
+ * 
+ *      upload_photo('/img/photos/');
+ *      upload_photo('/img/users/prifile/photo/', $user_id);
+ * 
+ * Políticas de imagem definidas pela função:
+ * 
+ *      • Envia somente uma imagem por vez;
+ *      • Suporta imagens nos formatos "jpeg", "jpg" e "png";
+ *      • Suporta imagens de, no máximo, 5 megabytes;
+ *      • Somente imagens quadradas;
+ *      • Imagens com dimensões mínimas de 64 x 64 pixels;
+ *      • Imagens com dimensões máximas de 512 x 512 pixels;
+ *      • Se o nome da imagem (2º parâmentro) for omitido ou definido como 
+ *        "" (vazio), a função gera um nome aleatório de 24 caracteres 
+ *        hexadecimais. 
+ * 
+ * OBS: essas políticas só podem ser alteradas, refatorando-se a função.
+ */
+function upload_photo($photo_dir, $photo_name = '')
+{
+
+    // Se $photo_name==='' (DEFAULT), gera um nome aleatório para a imagem.
+    if ($photo_name === '') {
+        $photo_name = substr(sha1(time() + rand()), 40 - min(24, 40));
+        // $photo_name = bin2hex(random_bytes(12));
+    }
+
+    // Metadados da imagem
+    $return_url = false;                                                       // URL da imagem salva
+    $error = false;                                                            // Mensagens de erro
+    $photo_data = $_FILES['photo'];                                            // Dados do arquivo
+    list($photo_width, $photo_height) = getimagesize($photo_data['tmp_name']); // Dimensões da imagem
+    $photo_type = strtolower($photo_data['type']);                             // Tipo MIME da imagem
+    $photo_ext = trim(explode('/', $photo_type)[1]);                           // Extensão do nome da imagem
+    $photo_url = $photo_dir . $photo_name . '.' . $photo_ext;                  // URL da imagem
+
+    // Testa os tipos de imagem válidos (jpg, jpeg e png).
+    if (
+        $photo_type !== 'image/jpeg' and
+        $photo_type !== 'image/jpg' and
+        $photo_type !== 'image/png'
+    ) {
+
+        $error .= "A imagem não está em um formato válido.";
+
+        // Testa o tamanho da imagem.
+    } elseif (
+        $photo_data['size'] > 5000000   // Imagem tem mais que 5 megabytes?
+    ) {
+
+        $error .= "A imagem deve ter menos de 5MB.";
+
+        // Testa as dimensões da imagem.
+    } elseif (
+        $photo_width < 64 or              // Largura menor que 64 pixels?
+        $photo_width > 512 or             // Largura maior que 512 pixels?
+        $photo_width !== $photo_height   // Largura e altura são diferentes?
+    ) {
+
+        $error .= "A imagem deve ser quadrada entre 64px e 512px.";
+
+        // Salvando a imagem no destino.
+    } else {
+
+        if (move_uploaded_file($photo_data["tmp_name"], $_SERVER['DOCUMENT_ROOT'] . $photo_url)) {
+            $return_url .= $photo_url;
+        } else {
+            $error .= "Erro ao enviar imagem.";
+        }
+    }
+
+    // Retorno da função
+    return array(
+        'url' => $return_url,   // Endereço (URL) da imagem salva no servidor.
+        'error' => $error       // Mensagem de erro em caso de falha.
+    );
+}
