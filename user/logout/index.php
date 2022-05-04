@@ -43,8 +43,8 @@ require($_SERVER['DOCUMENT_ROOT'] . '/_header.php');
     <h2>Logout / Sair</h2>
     <p>Se você sair do aplicativo agora, terá que entrar novamente para ter acesso ao conteúdo exclusivo.</p>
     <p>Clique no botão abaixo para sair.</p>
-    <p class="btn-center">
-        <button type="button" onclick="location.href = '?logout'">
+    <p class="text-center">
+        <button class="btn-logout" type="button" onclick="location.href = '?logout'">
             <i class="fa-solid fa-right-from-bracket fa-fw"></i>
             Logout / Sair
         </button>

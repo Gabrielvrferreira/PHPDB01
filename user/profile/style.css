@@ -19,9 +19,3 @@
 .author-meta h2 {
     text-align: center;
 }
-
-.btn-user {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 1rem;
-}

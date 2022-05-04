@@ -26,6 +26,9 @@ SQL;
 // Executa a query --> '$res' contém os artigos encontrados.
 $res = $conn->query($sql);
 
+// Abre a lista de artigos.
+$artigos = '<div class="items">' . "\n";
+
 // Loop que obtém cada registro de '$res'
 while ($artigo = $res->fetch_assoc()) :
 
@@ -43,6 +46,9 @@ while ($artigo = $res->fetch_assoc()) :
 HTML;
 
 endwhile;
+
+// Fecha a lista de artigos.
+$artigos .= '</div>';
 
 /************************************************
  * Seus códigos PHP desta página terminam aqui! *
@@ -62,14 +68,12 @@ require($_SERVER['DOCUMENT_ROOT'] . '/_header.php');
 
 <section>
 
-    <div class="items">
-        <?php
+    <?php
 
-        // Exibe todos os artigos.
-        echo $artigos;
+    // Exibe todos os artigos.
+    echo $artigos;
 
-        ?>
-    </div>
+    ?>
 
 </section>
 
