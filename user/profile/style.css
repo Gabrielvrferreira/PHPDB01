@@ -20,8 +20,10 @@
     text-align: center;
 }
 
-.btn-user {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 1rem;
+.user-photo a {
+    float: right;
+    margin-top: -2rem;
+    border: 1px solid grey;
+    border-radius: .3rem;
+    padding: .25rem;
 }

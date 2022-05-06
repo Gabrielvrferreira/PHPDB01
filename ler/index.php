@@ -84,7 +84,11 @@ $html_author = <<<HTML
 
 HTML;
 
-// Verifica se autor tem mais artigos
+/**
+ * Verifica se autor tem mais artigos.
+ * Se tiver, obtém até 4 de forma aleatória.
+ * E, não pega o artigo atual.
+ */
 $sql = <<<SQL
 
 SELECT art_id, art_title, art_intro 
@@ -101,13 +105,15 @@ SQL;
 // Executa a query
 $res = $conn->query($sql);
 
-// Verifica se tem artigos
+// Se tem mais artigos dete author...
 if ($res->num_rows > 0) :
 
-
+    // Exibe a chamada para os artigos encontrados.
     $html_author .= <<<HTML
 
 <div class="author-articles">
+
+    <hr class="divider">
 
     <h3>+ Artigos de {$nome}</h3>
 

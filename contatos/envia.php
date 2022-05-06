@@ -78,9 +78,14 @@ SQL;
         $feedback = <<<HTML
 
 <h3>Olá {$parts[0]}!</h3>
-<p>Seu contato foi enviado com sucesso.</p>
+<blockquote>Seu contato foi enviado com sucesso.</blockquote>
 <p><em>Obrigado...</em></p>
-<p><button onclick="location.href = '/'"><i class="fa-solid fa-house-chimney"></i> Página inicial</button></p>    
+<p class="text-center">
+    <a href="/" title="Ir para a página inicial.">
+        <i class="fa-solid fa-house-chimney"></i>
+        Página inicial
+    </a>
+</p>    
 
 HTML;
 
@@ -141,7 +146,9 @@ require($_SERVER['DOCUMENT_ROOT'] . '/_header.php');
 <section>
 
     <h2>Faça contato</h2>
-    <?php echo $feedback ?>
+    <div class="text-box">
+        <?php echo $feedback ?>
+    </div>
 
 </section>
 

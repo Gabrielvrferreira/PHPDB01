@@ -48,10 +48,12 @@ if (isset($_COOKIE['user']))
 else
     $user = false;
 
+// dump($user, false);
+
 /*************************
  * Funções de uso geral. *
  *************************/
-/* Essas funções estão acessíveis para qualquer parte do aplicativo. */
+/* Essas funções estão acessíveis em qualquer parte do aplicativo. */
 
 /**
  * Função que calcula a idade.
@@ -70,29 +72,29 @@ else
 function get_years_old($birth)
 {
 
-    // O array '$n' contém a data atual
+    // O array '$n' contém a data atual.
     $n = array(date('Y'), date('m'), date('d'));
 
-    // O array '$b' contém a data de nascimento
+    // O array '$b' contém a data de nascimento.
     $b = explode('-', $birth);
 
-    // Calculando a idade pelo ano (ano_atual - ano_nascimento)
+    // Calculando a idade pelo ano (ano_atual - ano_nascimento).
     $yo = $n[0] - $b[0];
 
     // Se o mês é menor que o mês de nascimento...
     if ($n[1] < $b[1]) {
 
-        // ... subtrai 1 ano
+        // ... subtrai 1 ano da idade.
         $yo--;
 
         // Se é o mesmo mês e o dia é menor que o dia de nascimento...
     } elseif ($n[1] == $b[1] and $n[2] <= $b[2]) {
 
-        // ... subtrai 1 ano
+        // ... subtrai 1 ano da idade.
         $yo--;
     }
 
-    // Retorno
+    // Retorna a idade em anos.
     return $yo;
 }
 
@@ -110,7 +112,7 @@ function get_years_old($birth)
  *      exit --> Se true, encerra o script com 'exit'. Se false, continua o script.
  *              Default: $exit = true
  * 
- * Exemplo de uso:
+ * Exemplos de uso:
  * 
  *      1) degub($variavel);
  *         Envia o "DUMP" da "$variável" para a saída (navegador).
@@ -132,9 +134,103 @@ function get_years_old($birth)
  *         O DUMP é exibido sem pré-formatação.
  *         O script NÃO é interrompido com 'exit'.
  */
-function dump($variable, $exit = true, $pre = true) {
-    if($pre) echo '<pre>';
+function dump($variable, $exit = true, $pre = true)
+{
+    if ($pre) echo '<pre>';
     print_r($variable);
-    if($pre) echo '</pre>';
-    if($exit) exit;
+    if ($pre) echo '</pre>';
+    if ($exit) exit;
+}
+
+/**
+ * Função que envia uma imagem para o servidor via PHP upload.
+ * 
+ * O primeiro parâmetro é obrigatório e especifica o caminho absoluto do 
+ * aplicativo, onde a imagem será armazenada, com base na raiz do aplicativo.
+ * Esse atributo deve sempre terminar com a '/'.
+ * 
+ * O segundo parâmetro define o nome da imagem, sem a extensão.
+ * Se este for omitido, a função gera um nome aleatório de 24 caracteres 
+ * hexadecimais (12 bytes).
+ * 
+ * Exemplos de uso:
+ * 
+ *      upload_photo('/img/photos/');
+ *      upload_photo('/img/users/prifile/photo/', $user_id);
+ * 
+ * Políticas de imagem definidas pela função:
+ * 
+ *      • Envia somente uma imagem por vez;
+ *      • Suporta imagens nos formatos "jpeg", "jpg" e "png";
+ *      • Suporta imagens de, no máximo, 1 megabyte;
+ *      • Somente imagens quadradas;
+ *      • Imagens com dimensões mínimas de 64 x 64 pixels;
+ *      • Imagens com dimensões máximas de 512 x 512 pixels;
+ *      • Se o nome da imagem (2º parâmentro) for omitido ou definido como 
+ *        "" (vazio), a função gera um nome aleatório de 24 caracteres 
+ *        hexadecimais. 
+ * 
+ * OBS: essas políticas só podem ser alteradas, refatorando-se a função.
+ */
+function upload_photo($photo_dir, $photo_name = '')
+{
+
+    // Se $photo_name==='' (DEFAULT), gera um nome aleatório para a imagem.
+    if ($photo_name === '')
+        $photo_name = substr(sha1(time() + rand()), 40 - min(24, 40));
+
+    // Obtém os metadados da imagem, necessários para o tratamento desta.
+    $return_url = false;                                                       // URL da imagem salva
+    $error = false;                                                            // Mensagens de erro
+    $photo_data = $_FILES['photo'];                                            // Dados do arquivo vindos do cliente
+    list($photo_width, $photo_height) = getimagesize($photo_data['tmp_name']); // Dimensões da imagem
+    $photo_type = strtolower($photo_data['type']);                             // Tipo MIME da imagem
+    $photo_ext = trim(explode('/', $photo_type)[1]);                           // Extensão do nome da imagem
+    $photo_url = $photo_dir . $photo_name . '.' . $photo_ext;                  // URL da imagem
+
+    // Testa os tipos de imagem válidos (jpg, jpeg e png)...
+    if (
+        $photo_type !== 'image/jpeg' and
+        $photo_type !== 'image/jpg' and
+        $photo_type !== 'image/png'
+    ) {
+
+        $error .= "A foto não está em um formato válido.";
+
+        // Testa o tamanho da imagem...
+    } elseif (
+        $photo_data['size'] > 1000000   // Imagem tem mais que 1 megabyte?
+    ) {
+
+        $error .= "A foto deve ter menos de 1MB.";
+
+        // Testa as dimensões da imagem...
+    } elseif (
+        $photo_width < 64 or             // Largura menor que 64 pixels?
+        $photo_width > 512 or            // Largura maior que 512 pixels?
+        $photo_width !== $photo_height   // Largura e altura são diferentes?
+    ) {
+
+        $error .= "A foto não está em um formato válido.";
+
+        // Salvando a imagem no destino...
+    } else {
+
+        //   comando_move            origem                        destino   
+        if (move_uploaded_file($photo_data["tmp_name"], $_SERVER['DOCUMENT_ROOT'] . $photo_url)) {
+
+            // Gera URL da imagem...
+            $return_url .= $photo_url;
+        } else {
+
+            // Se der erro, avisa ao front-end.
+            $error .= "Erro ao enviar foto.";
+        }
+    }
+
+    // O retorno da função é um array com os íduices abaixo:
+    return array(
+        'url' => $return_url,   // Endereço (URL) da imagem salva no servidor ou "false" se der erro.
+        'error' => $error       // Mensagem de erro em caso de falha ou "false" se deu certo.
+    );
 }

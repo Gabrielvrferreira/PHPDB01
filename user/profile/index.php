@@ -32,7 +32,10 @@ $html = <<<HTML
 <div class="author-meta">
 
     <h2>{$nome}</h2>
-    <img src="{$user['user_photo']}" alt="{$user['user_name']}">
+    <div class="user-photo">
+        <img src="{$user['user_photo']}" alt="{$user['user_name']}">
+        <a href="/user/profile/" title="Alterar foto de perfil."><i class="fa-solid fa-pen-to-square fa-fw"></i></a>
+    </div>
     &nbsp;
     <ul>
         <li><strong>{$user['user_name']}</strong></li>
@@ -40,18 +43,18 @@ $html = <<<HTML
         <li>Nasceu em {$user['birth_br']} ({$idade} anos)</li>
         <li>{$user['user_profile']}</li>
     </ul>
+<hr class="divider">
+    <div class="user-links">
 
-    <div class="btn-user">
-
-        <button type="button" onclick="location.href='/user/edit/'">
+        <a href="/user/edit/">
             <i class="fa-solid fa-address-card fa-fw"></i>
             Editar Perfil
-        </button>
+        </a>
 
-        <button type="button" onclick="location.href='/user/logout/'">
+        <a href="/user/logout/">
             <i class="fa-solid fa-right-from-bracket fa-fw"></i>
             Logout / Sair
-        </button>
+        </a>
 
     </div>
 

@@ -263,12 +263,117 @@ body {
  * Podem ser aplicados em qualquer página do aplicativo.
  */
 
+.text-center {
+    text-align: center;
+}
+
+.block-center {
+    display: table;
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+}
+
+.user-links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
 hr.divider {
     border: none;
     border-top: 1px dotted grey;
     border-bottom: 1px dotted grey;
     height: 3px;
     margin: 1rem 0;
+}
+
+/**
+ * Botões e campos de formulário.
+ * Podem ser aplicados em qualquer página do aplicativo.
+ */
+
+form label {
+    display: block;
+    margin-bottom: .25rem;
+    margin-left: .25rem;
+}
+
+form input,
+form textarea,
+form button,
+form button[onclick] {
+    font-family: inherit;
+    font-size: inherit;
+    padding: .25rem .5rem;
+    border: 1px solid grey;
+    border-radius: .3rem;
+}
+
+form input,
+form textarea {
+    width: 100%;
+}
+
+form textarea {
+    height: 6rem;
+    resize: vertical;
+}
+
+form button,
+form button[onclick] {
+    background: steelblue;
+    color: white;
+    cursor: pointer;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+form button:hover,
+form button[onclick]:hover {
+    background: orangered;
+}
+
+/* Marca campos inválidos. */
+
+form input:invalid,
+form textarea:invalid {
+    background: rgb(255, 207, 207);
+    border-bottom: 3px solid red;
+}
+
+/* Marca campos válidos. */
+
+form input:valid,
+form textarea:valid {
+    background: rgb(232, 240, 254);
+    border-bottom: 3px solid green;
+}
+
+/* Desabilita botão de envio se formulário está inválido. */
+
+form:invalid button {
+    background: rgb(88, 88, 88);
+    color: rgb(219, 219, 219);
+    cursor: not-allowed;
+}
+
+form input[type="checkbox"] {
+    width: auto;
+}
+
+form input.password {
+    max-width: 50%;
+}
+
+/* Botão que mostra/oculta senha. */
+
+form button[id="passToggle"] {
+    padding-left: .5rem;
+    padding-right: .5rem;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
 }
 
 /**

@@ -34,26 +34,23 @@
             <a href="/sobre/" title="Sobre..."><i class="fa-solid fa-circle-info fa-fw"></i><span>Sobre</span></a>
 
             <?php
-
             // Se usuário está logado...
             if ($user) :
+
+                // Exibe foto dele e link para perfil.
             ?>
 
-                <a href="/user/profile/" title="Usuário">
-                    <img src="<?php echo $user['user_photo'] ?>" alt="<?php echo $user['user_name'] ?>">
-                    <span>Profile</span>
-                </a>
+                <a href="/user/profile/" title="Perfil"><img src="<?php echo $user['user_photo'] ?>" alt="<?php echo $user['user_name'] ?>"><span>Perfil</a>
 
             <?php
 
-            // Se usuário NÃO está logado
+            // Se usuário não está logado...
             else :
+
+                // Exibe link para login
             ?>
 
-                <a href="/user/login/" title="Usuário">
-                    <i class="fa-solid fa-right-to-bracket fa-fw"></i>
-                    <span>Login</span>
-                </a>
+                <a href="/user/login/" title="Usuário"><i class="fa-solid fa-right-to-bracket fa-fw"></i><span>Login</span></a>
 
             <?php
             endif;

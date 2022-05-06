@@ -2,6 +2,17 @@
 
 @import url('/contatos/style.css');
 
-.btn-center {
-    text-align: center;
+.btn-logout {
+    font-size: inherit;
+    font-family: inherit;
+    padding: .3rem 1rem;
+    background: orangered;
+    color: white;
+    border: 1px solid grey;
+    border-radius: .3rem;
+    cursor: pointer;
+}
+
+.btn-logout:hover {
+    background: red;
 }
