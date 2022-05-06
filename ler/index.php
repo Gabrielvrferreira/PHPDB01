@@ -14,6 +14,12 @@ $title = "Quem tem fome tem pressa...";
  * Seus códigos PHP desta página iniciam aqui! *
  ***********************************************/
 
+// Exibe feedback sobre um comentário enviado.
+$comment_send = false;
+
+// Lista de comentários
+$comment_list = '';
+
 // Obtém o ID do artigo da URL da página. 
 if (isset($_GET['id'])) $id = intval($_GET['id']);
 else $id = 0;
@@ -139,12 +145,91 @@ HTML;
 
 endif;
 
-/**
- * Tarefas:
- * Eibir o perfil do autor na aside
- * Exibir mais artigos do autor
- * Exibir a idade do autor (tarefa de casa)
- */
+/***************
+ * Comentários *
+ ***************/
+
+// Obtém todos os comentários deste artigo.
+$sql = <<<SQL
+
+SELECT comments.*, users.user_name,
+DATE_FORMAT(cmt_date, '%d/%m/%Y às %H:%i') AS cmt_date_br
+ FROM comments
+ INNER JOIN users ON cmt_author = user_id
+WHERE cmt_article = '{$id}'
+AND cmt_status = 'on'
+ORDER BY cmt_date DESC;
+
+SQL;
+
+// Executa a query
+$res = $conn->query($sql);
+
+// Se existem comentários...
+if ($res->num_rows > 0) :
+
+    // Loop para listar comentários.
+    while($cmt = $res->fetch_assoc()):
+
+        $comment_list .= <<<HTML
+     
+     <div class="comment">
+        <div class="comment-meta">
+            Por {$cmt['user_name']} em {$cmt['cmt_date_br']}.
+        </div>
+        {$cmt['cmt_comment']}
+     </div>
+        
+HTML;        
+
+    endwhile;
+
+// Se não existem comentários...
+else :
+
+    // Convida para comentar.
+    $comment_list = '<p class="text-center">Nenhum comentário ainda! Seja a(o) primeira(o) a comentar.</p>';
+endif;
+
+// Se usuário está logado, exibe caixa de comentários no final do artigo.
+if (isset($_COOKIE['user']))
+    $comment_form = true;
+else
+    $comment_form = false;
+
+// Se usuário comentou...
+if ($_SERVER["REQUEST_METHOD"] == "POST") :
+
+    // Recebe o comentário e sanitiza
+    $comment = trim(htmlspecialchars($_POST['comment']));
+
+    // Verifica se comentário está preenchido.
+    if ($comment !== '') :
+
+        // Gera query para o banco de dados
+        $sql = <<<SQL
+
+INSERT INTO comments (
+    cmt_article,
+    cmt_author,
+    cmt_comment
+) VALUES (
+    '{$id}',
+    '{$artigo['user_id']}',
+    '{$comment}'
+);
+
+SQL;
+
+        // Executa a query
+        $conn->query($sql);
+
+        // Feedback do comentário
+        $comment_send = true;
+
+    endif;
+
+endif;
 
 /************************************************
  * Seus códigos PHP desta página terminam aqui! *
@@ -160,24 +245,89 @@ require($_SERVER['DOCUMENT_ROOT'] . '/_header.php');
 <section>
 
     <?php
-
     // Exibe o conteúdo do artigo completo
     echo $html_article;
-
     ?>
+
+    <hr class="divider">
+
+    <?php if ($comment_form) : ?>
+
+        <h3>Comente:</h3>
+        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . '?id=' . $id; ?>" method="post">
+
+            <p>
+                <textarea name="comment" id="comment" required>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Dolorum enim ipsa quas voluptatem, quo recusandae incidunt fuga nam optio temporibus nobis cum corrupti a commodi, in facere modi libero fugiat.</textarea>
+                <button type="submit">Comentar</button>
+            </p>
+
+        </form>
+
+        <hr class="divider">
+
+    <?php endif; ?>
+
+    <h3>Comentários:</h3>
+
+    <?php echo $comment_list; ?>
 
 </section>
 
 <aside>
 
     <?php
-
     // Exibe os dados do autor do artigo
     echo $html_author;
-
     ?>
 
 </aside>
+
+<?php
+// Se enviou um comentário...
+if ($comment_send) :
+?>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Oba!</h3>
+            <p>Seu comentário foi enviado com sucesso!</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Get the modal
+        var modal = document.getElementById("myModal");
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("myBtn");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal 
+        modal.style.display = "block";
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+
+<?php
+endif;
+?>
 
 <?php
 
