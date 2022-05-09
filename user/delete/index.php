@@ -17,6 +17,27 @@ require($_SERVER['DOCUMENT_ROOT'] . '/_config.php');
  * Seus códigos PHP desta página iniciam aqui! *
  ***********************************************/
 
+// Se confirmou o cancelamento...
+if ($_SERVER['QUERY_STRING'] === 'delete') :
+
+    // SQL que atualiza o banco de dados.
+    $sql = <<<SQL
+
+UPDATE users SET user_status = 'deleted'
+WHERE user_id = '{$user['user_id']}'
+
+SQL;
+
+    // Executa a query.
+    $conn->query($sql);
+
+    // Apaga cookie.
+    setcookie('user', '', -1, '/');
+
+    // Redireciona para a home.
+    header('Location: /');
+
+endif;
 
 /************************************************
  * Seus códigos PHP desta página terminam aqui! *
@@ -30,7 +51,7 @@ require($_SERVER['DOCUMENT_ROOT'] . '/_config.php');
  *     → https://www.w3schools.com/php/php_variables.asp
  *     → https://www.php.net/manual/pt_BR/language.variables.basics.php
  */
-$title = "Quem tem fome tem pressa...";
+$title = "Cancelar Cadastro";
 
 /**
  * Inclui o cabeçalho da página.
@@ -41,9 +62,16 @@ require($_SERVER['DOCUMENT_ROOT'] . '/_header.php');
 
 <section>
 
-    <h2>Título da página</h2>
-    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum, iste aliquam aperiam voluptatem molestias nemo odit unde modi cupiditate exercitationem doloremque quaerat soluta rerum quidem dignissimos officiis sapiente, aut alias!</p>
-    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Optio soluta voluptatum consequatur voluptatibus cupiditate temporibus qui, nostrum deserunt minus laudantium in officia rem dignissimos facilis modi culpa error aliquam? Quam?</p>
+    <h2>Cancelar Cadastro</h2>
+    <p class="text-center" style="color: grey"><i class="fa-solid fa-user-xmark fa-fw fa-4x"></i></p>
+    <p>Tem certeza que deseja cancelar seu cadastro? Se cancelar, não será mais possível acessar o conteúdo exclusivo.</p>
+    <p>Clique no botão abaixo para cancelar o cadastro.</p>
+    <p class="text-center">
+        <button class="btn-logout" type="button" onclick="location.href = '?delete'">
+            <i class="fa-solid fa-user-xmark fa-fw"></i>
+            &nbsp;Cancelar cadastro
+        </button>
+    </p>
 
 </section>
 
