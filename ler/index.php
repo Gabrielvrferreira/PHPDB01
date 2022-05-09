@@ -152,7 +152,7 @@ endif;
 // Obtém todos os comentários deste artigo.
 $sql = <<<SQL
 
-SELECT comments.*, users.user_name,
+SELECT comments.*, users.user_name, users.user_photo,
 DATE_FORMAT(cmt_date, '%d/%m/%Y às %H:%i') AS cmt_date_br
  FROM comments
  INNER JOIN users ON cmt_author = user_id
@@ -169,7 +169,7 @@ $res = $conn->query($sql);
 if ($res->num_rows > 0) :
 
     // Loop para listar comentários.
-    while($cmt = $res->fetch_assoc()):
+    while ($cmt = $res->fetch_assoc()) :
 
         $comment_list .= <<<HTML
      
@@ -180,7 +180,7 @@ if ($res->num_rows > 0) :
         {$cmt['cmt_comment']}
      </div>
         
-HTML;        
+HTML;
 
     endwhile;
 
@@ -257,7 +257,7 @@ require($_SERVER['DOCUMENT_ROOT'] . '/_header.php');
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . '?id=' . $id; ?>" method="post">
 
             <p>
-                <textarea name="comment" id="comment" required>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Dolorum enim ipsa quas voluptatem, quo recusandae incidunt fuga nam optio temporibus nobis cum corrupti a commodi, in facere modi libero fugiat.</textarea>
+                <textarea name="comment" id="comment" required></textarea>
                 <button type="submit">Comentar</button>
             </p>
 
@@ -287,41 +287,40 @@ require($_SERVER['DOCUMENT_ROOT'] . '/_header.php');
 if ($comment_send) :
 ?>
 
-    <!-- The Modal -->
+    <!-- Cria modal -->
     <div id="myModal" class="modal">
 
-        <!-- Modal content -->
+        <!-- Conteúdo do modal -->
         <div class="modal-content">
-            <span class="close">&times;</span>
+            <span class="close" id="btnClose">&times;</span>
             <h3>Oba!</h3>
             <p>Seu comentário foi enviado com sucesso!</p>
+            <p>Atualize a página para vê-lo...</p>
         </div>
 
     </div>
 
     <script>
-        // Get the modal
-        var modal = document.getElementById("myModal");
-
-        // Get the button that opens the modal
-        var btn = document.getElementById("myBtn");
-
-        // Get the <span> element that closes the modal
-        var span = document.getElementsByClassName("close")[0];
-
-        // When the user clicks the button, open the modal 
-        modal.style.display = "block";
-
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
-            modal.style.display = "none";
+        // Bloqueia reenvio do form caso a página seja recarregada.
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
         }
 
-        // When the user clicks anywhere outside of the modal, close it
+        // Abre o modal ao carregá-lo.
+        myModal.style.display = "block";
+
+        // Ao clicar no X, fecha o modal.
+        btnClose.onclick = closeModal;
+
+        // Ao cliar em qualquer lugar do modal, fecha o modal.
         window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
+            if (event.target == myModal) closeModal();
+        }
+
+        // Fecha o modal e recarrega a página.
+        function closeModal() {
+            myModal.style.display = "none";
+            location.reload();
         }
     </script>
 

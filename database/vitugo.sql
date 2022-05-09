@@ -39,6 +39,7 @@ CREATE TABLE comments (
     cmt_id INT PRIMARY KEY AUTO_INCREMENT,
     cmt_article INT,
     cmt_author INT,
+    cmt_comment TEXT,
     cmt_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     cmt_status ENUM('on', 'off', 'deleted') DEFAULT 'on',
     FOREIGN KEY (cmt_article) REFERENCES articles (art_id),

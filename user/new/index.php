@@ -2,6 +2,14 @@
 
 /**
  * Arquivo que faz a configuração incial da página.
+ * Por exemplo, conecta-se ao banco de dados.
+ * 
+ * A superglobal "$_SERVER['DOCUMENT_ROOT']" retorna o caminho da raiz do site no Windows.
+ * Ex.: C:\xampp\htdocs 
+ *     Referências:
+ *     → https://www.w3schools.com/php/php_includes.asp
+ *     → https://www.php.net/manual/pt_BR/function.include.php
+ *     → https://www.php.net/manual/pt_BR/language.variables.superglobals.php
  */
 require($_SERVER['DOCUMENT_ROOT'] . '/_config.php');
 
@@ -9,11 +17,11 @@ require($_SERVER['DOCUMENT_ROOT'] . '/_config.php');
  * Seus códigos PHP desta página iniciam aqui! *
  ***********************************************/
 
-// Se usuário já está logado, redireciona para a página de perfil dele.
-if (isset($_COOKIE['user'])) header('Location: /user/profile/');
+// Se usuário NÃO está logado, envia para 'login'.
+if (!isset($_COOKIE['user'])) header('Location: /user/login/');
 
-// Cria e inicializa as variáveis usadas no script
-$name = $email = $birth = $profile = $password = $photo = $error = '';
+// Variáveis principais
+$id = $name = $email = $birth = $profile = $error = '';
 $feedback = false;
 
 // Se formulário foi enviado...
@@ -32,10 +40,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
 
     else :
 
-        // Verifica se e-mail já está cadastrado.
-        $res = $conn->query("SELECT user_id FROM users WHERE user_email = '{$email}';");
-        if ($res->num_rows != 0)
-            $error .= '<li>Este e-mail já está em uso;</li>';
+        // Se editou o e-mail.
+        if ($email !== $user['user_email']) :
+
+            // Verifica se e-mail já está cadastrado.
+            $res = $conn->query("SELECT user_id FROM users WHERE user_email = '{$email}';");
+            if ($res->num_rows != 0)
+                $error .= '<li>Este e-mail já está em uso;</li>';
+
+        endif;
 
     endif;
 
@@ -47,80 +60,88 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") :
     // Recebe o 'perfil' do formulário e sanitiza.
     $profile = trim(htmlspecialchars($_POST['profile']));
 
-    // Recebe a 'senha' do formulário, sanitiza e valida.
-    $password = trim(htmlspecialchars($_POST['password']));
-    if (!preg_match('/(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\S+$).{7,32}/', $password))
-        $error .= '<li>A senha está fora do padrão;</li>';
-
-    // Se enviou uma foto de perfil...
-    if ($_FILES['photo']['size'] > 0) :
-
-        // Recebe a 'foto' do formulário, e faz upload.
-        $array_photo = upload_photo('/user/img/');
-
-        // Se ocorreu algum erro com a foto...
-        if ($array_photo['error']) {
-
-            // Gera mensagem de erro.
-            $error .= '<li>' . $array_photo['error'] . '</li>';
-
-            // Carrega uma foto padrão.
-            $photo = '/user/img/generic_user.png';
-
-            // Se não ocorreu erro no upload...
-        } else {
-
-            // Obtém URL da foto.
-            $photo = $array_photo['url'];
-        }
-
-    // Se não enviou uma foto...
-    else :
-
-        // Carrega uma foto padrão.
-        $photo = '/user/img/generic_user.png';
-    endif;
-
-    // Se não ocorreram erros ainda...
+    // Se não exitem erros.
     if ($error === '') :
 
-        // Prepara SQL
+        // Query de atualização do cadastro.
         $sql = <<<SQL
 
-INSERT INTO users (
-    user_name,
-    user_email,
-    user_birth,
-    user_photo,
-    user_profile,
-    user_password,
-    user_type
-) VALUES 
-(
-    '{$name}',
-    '{$email}',
-    '{$birth}',
-    '{$photo}',
-    '{$profile}',
-    SHA1('{$password}'),
-    'user'
-);
+UPDATE `users` SET 
+	user_name = '{$name}',
+	user_email = '{$email}',
+	user_birth = '{$birth}',
+	user_profile = '{$profile}'
+WHERE user_id = '{$user['user_id']}'
+    AND user_status = 'on';
 
 SQL;
 
-        // Executa SQL
+        // Executa a query.
+        $conn->query($sql);
+
+        // SQL para obter TODOS os dados do usuário e gerar o cookie novamente.
+        $sql = <<<SQL
+
+SELECT *,
+    DATE_FORMAT(user_birth, '%d/%m/%Y') AS birth_br
+FROM `users`
+WHERE user_email = '{$email}'
+    AND user_status = 'on';
+                
+SQL;
+
+        // Executa a query.
         $res = $conn->query($sql);
+
+        // Obtém dados do usuário.
+        $user_data = $res->fetch_assoc();
+
+        // Apaga a senha.
+        unset($user_data['user_password']);
+
+        // Adiciona expiração do cookie.
+        $user_data['expires'] = $user['expires'];
+
+        // Grava o cookie no navegador
+        setcookie(
+            'user',                 // nome do cookie criado
+            serialize($user_data),  // valor do cookie
+            $user['expires'],       // tempo de vida do cookie em segundos
+            '/'                     // Domínio do cookie "/" de localhost
+        );
 
         // Feedback
         $feedback = true;
 
-    // Se ocorreram erros...
-    else :
-
-        // Formada mensagem de erro.
-        $error = '<h3>Oooops!</h3><p>ocorreram erros que impedem seu cadastro:</p><ul>' . $error . '</ul>';
-
     endif;
+
+// Obtendo os dados do banco e preenchendo o formulário.
+else :
+
+    // Obtém dados do banco de dados.
+    $sql = <<<SQL
+
+SELECT `user_id`, `user_name`, `user_email`, `user_birth`, `user_profile` FROM `users`
+WHERE `user_id` = '{$user['user_id']}'
+	AND `user_status` = 'on';
+
+SQL;
+
+    // Executa a query.
+    $res = $conn->query($sql);
+
+    // Se não recebeu os dados, envia para login.
+    if ($res->num_rows != 1) header('Location: /user/login/');
+
+    // Obtém dados do usuário.
+    $user_data = $res->fetch_assoc();
+
+    // Atribuindo aos campos do formulário.
+    $id = $user_data['user_id'];
+    $name = $user_data['user_name'];
+    $email = $user_data['user_email'];
+    $birth = $user_data['user_birth'];
+    $profile = $user_data['user_profile'];
 
 endif;
 
@@ -130,8 +151,13 @@ endif;
 
 /**
  * Variável que define o título desta página.
+ * Essa variável é usada no arquivo "_header.php".
+ * OBS: para a página inicial (index.php) usaremos o 'slogan' do site.
+ *     Referências:
+ *     → https://www.w3schools.com/php/php_variables.asp
+ *     → https://www.php.net/manual/pt_BR/language.variables.basics.php
  */
-$title = "Cadastro...";
+$title = "Editar perfil";
 
 /**
  * Inclui o cabeçalho da página.
@@ -142,80 +168,69 @@ require($_SERVER['DOCUMENT_ROOT'] . '/_header.php');
 
 <section>
 
-    <h2>Cadastre-se</h2>
+    <h3>Editar Perfil</h3>
 
-    <p class="text-center" style="color:grey"><i class="fa-solid fa-user-plus fa-fw fa-4x"></i></p>
-
-    <?php if ($feedback) : ?>
+    <?php
+    // Se o cadastyro foi finalizado com sucesso...
+    if ($feedback) :
+    ?>
 
         <div class="block-center">
 
             <h3>Oba!</h3>
-            <p>Seu cadastro foi feito com sucesso!</p>
-            <p>Logue-se para acessar o conteúdo exclusivo do site.</p>
+            <p>Seu cadastro foi atualizado com sucesso!</p>
             <hr class="divider">
-            <p class="user-links">
-                <a href="/user/login/"><i class="fa-solid fa-right-to-bracket fa-fw"></i> Entrar / Login</a>
-                <a href="/"><i class="fa-solid fa-home fa-fw"></i> Início</a>
-            </p>
+            <div class="user-links">
 
+                <a href="/user/profile/">
+                    <i class="fa-solid fa-address-card fa-fw"></i>
+                    Ver Perfil
+                </a>
+
+                <a href="/">
+                    <i class="fa-solid fa-house fa-fw"></i>
+                    Página inicial
+                </a>
+
+            </div>
         </div>
+
+        <script>
+            // JavaScript que bloqueia reenvio do form caso a página seja recarregada.
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+            }
+        </script>
 
     <?php else : ?>
 
-        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" name="newuser" enctype="multipart/form-data">
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" name="edituser">
 
-            <p>Preencha todos os campos com atenção para se cadastrar e ter acesso aos recursos exclusivos.</p>
+            <p>Altere somente os campos que deseja editar.</p>
 
             <?php if ($error != '') echo '<div class="error">' . $error . '</div>'; ?>
 
             <p>
                 <label for="name">Nome completo:</label>
-                <input type="text" name="name" id="name" required minlength="3" class="valid" autocomplete="off" value="Joca da Silva">
+                <input type="text" name="name" id="name" required minlength="3" class="valid" autocomplete="off" value="<?php echo $name ?>">
             </p>
 
             <p>
                 <label for="email">E-mail:</label>
-                <input type="text" name="email" id="email" required class="valid" autocomplete="off" value="joca@silva.com">
+                <input type="text" name="email" id="email" required class="valid" autocomplete="off" value="<?php echo $email ?>">
             </p>
 
             <p>
                 <label for="birth">Data de nascimento:</label>
-                <input type="date" name="birth" id="birth" required class="valid" autocomplete="off" value="2000-10-11">
+                <input type="date" name="birth" id="birth" required class="valid" autocomplete="off" value="<?php echo $birth ?>">
             </p>
 
             <p>
-                <label for="photo">Imagem de perfil:</label>
-                <input type="file" name="photo" id="photo" class="valid" accept="image/jpeg, image/jpg, image/png">
-
-            <div class="form-help">
-                <ul>
-                    <li>Imagem quadrada no formato PNG ou JPG;</li>
-                    <li>Tamanho mínimo de 64px x 64px x 1MB ;</li>
-                    <li>Tamanho máximo de 515px x 512px x 1MB.</li>
-                </ul>
-            </div>
-            </p>
-
-            <p>
-                <label for="profile">Prefil resumido:</label>
-                <textarea name="profile" id="profile" class="valid" autocomplete="off">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque dolore, ab voluptate, earum deleniti.</textarea>
+                <label for="profile">Prefil resumido: <small>(Opcional)</small></label>
+                <textarea name="profile" id="profile" class="valid" autocomplete="off"><?php echo $profile ?></textarea>
             <div class="form-help">
                 <ul>
                     <li>Escreva sobre você, de forma resumida.</li>
-                </ul>
-            </div>
-            </p>
-
-            <p>
-                <label for="password">Senha:</label>
-                <input type="password" name="password" id="password" required pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\S+$).{7,32}$" class="valid password" autocomplete="off" value="Qw3rtyui0P">
-                <button type="button" id="passToggle"><i class="fa-solid fa-eye fa-fw"></i></button>
-            <div class="form-help">
-                <ul>
-                    <li>Mínimo de 7 e máximo de 32 caracteres;</li>
-                    <li>Pelo menos uma letra maiúscula de A até Z;</li>
-                    <li>Pelo menos um número de 0 à 9.</li>
                 </ul>
             </div>
             </p>
